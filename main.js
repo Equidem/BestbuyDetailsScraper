@@ -17,16 +17,16 @@ async function loadStopper(crawlingContext) {
 }
 
 async function pageFunction(context) {
-    console.log("Running page function");
+    //console.log("Running page function");
     const { page } = context;
     await Apify.utils.puppeteer.injectJQuery(page);
     const { url } = context.request;
 
-    console.log("Running page function before stopping");
+    //console.log("Running page function before stopping");
 
     await page.evaluate(_ => window.stop());
 
-    console.log("Running page function after stopping");
+    //console.log("Running page function after stopping");
 
     const { selector_name, name } = await page.evaluate(() => {
         let selector_name = '.sku-title';
@@ -42,7 +42,7 @@ async function pageFunction(context) {
         return { selector_name, name };
     });
 
-    console.log("Running page function after name");
+    //console.log("Running page function after name");
 
     const shortDescription = '';
     const selector_shortDescription = '';
@@ -61,7 +61,7 @@ async function pageFunction(context) {
         return { selector_price, price };
     });
 
-    console.log("Running page function after price");
+    //console.log("Running page function after price");
 
     const { selector_category, category } = await page.evaluate(() => {
         let selector_category = 'div:has(> div:has(> div:has(> div.shop-breadcrumb)))';
@@ -75,7 +75,7 @@ async function pageFunction(context) {
         return { selector_category, category };
     });
 
-    console.log("Running page after category");
+    //console.log("Running page after category");
 
     const { selector_longDescription, longDescription } = await page.evaluate(() => {
         let selector_longDescription = 'div:has(> .shop-overview-accordion)';
@@ -91,7 +91,7 @@ async function pageFunction(context) {
         return { selector_longDescription, longDescription };
     });
 
-    console.log("Running page after longDescription");
+    //console.log("Running page after longDescription");
 
     const { selector_images, images } = await page.evaluate(() => {
         let selector_images = 'div:has(> .shop-media-gallery)';
@@ -105,7 +105,7 @@ async function pageFunction(context) {
         return { selector_images, images };
     });
 
-    console.log("Running page function3");
+    //console.log("Running page function3");
 
     const { selector_specification, specification } = await page.evaluate(() => {
         let selector_specification = '.specifications-accordion-wrapper';
@@ -125,7 +125,7 @@ async function pageFunction(context) {
         return { selector_specification, specification };
     });
 
-    console.log({
+    /*console.log({
         selector_category,
         selector_images,
         selector_longDescription,
@@ -143,6 +143,8 @@ async function pageFunction(context) {
         longDescription,
     });
 
+     */
+
     const html = await page.evaluate(() => document.querySelector('*').outerHTML);
 
     // Print some information to actor log
@@ -150,7 +152,7 @@ async function pageFunction(context) {
 
     // Return an object with the data extracted from the page.
     // It will be stored to the resulting dataset.
-    return {
+    const datasetItem = {
         selector_category,
         selector_images,
         selector_longDescription,
@@ -168,10 +170,12 @@ async function pageFunction(context) {
         longDescription,
         html,
     };
+
+    Apify.pushData(datasetItem);
 }
 
 Apify.main(async () => {
-    input = await Apify.getInput();
+    const input = await Apify.getInput();
     //console.log(input);
     const startUrls = input['startUrls'];
 
