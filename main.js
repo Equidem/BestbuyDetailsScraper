@@ -5,15 +5,21 @@
  */
 
 const Apify = require('apify');
+let dataset = {};
+
 const { handleStart, handleList, handleDetail } = require('./src/routes');
 
 const { utils: { log } } = Apify;
-//var input = require('./apify_storage/key_value_stores/default/INPUT.json');
+var input = require('./apify_storage/key_value_stores/default/INPUT.json');
 
 async function loadStopper(crawlingContext) {
     await new Promise(resolve => setTimeout(resolve, 30000));
-    await crawlingContext.page._client.send("Page.stopLoading");
-    await crawlingContext.page.evaluate(_ => window.stop());
+    try {
+        await crawlingContext.page._client.send("Page.stopLoading");
+        await crawlingContext.page.evaluate(_ => window.stop());
+    } catch (e) {
+
+    }
 }
 
 async function pageFunction(context) {
@@ -48,7 +54,7 @@ async function pageFunction(context) {
     const selector_shortDescription = '';
 
     const { selector_price, price } = await page.evaluate(() => {
-        let selector_price = 'div:has(> div.priceView-hero-price)';
+        let selector_price = '.priceView-layout-large .priceView-hero-price span:first-child';
         let price = $(selector_price).text();
 
         if (price) {
@@ -171,13 +177,15 @@ async function pageFunction(context) {
         html,
     };
 
-    Apify.pushData(datasetItem);
+    if(selector_name != '')
+        dataset.pushData(datasetItem);
 }
 
 Apify.main(async () => {
-    const input = await Apify.getInput();
+    //const input = await Apify.getInput();
     //console.log(input);
     const startUrls = input['startUrls'];
+    dataset = await Apify.openDataset('bestbuyBigDataset', { forceCloud: true});
 
     const requestList = await Apify.openRequestList('start-urls', startUrls);
     const requestQueue = await Apify.openRequestQueue();
