@@ -10,7 +10,7 @@ let dataset = {};
 const { handleStart, handleList, handleDetail } = require('./src/routes');
 
 const { utils: { log } } = Apify;
-var input = require('./apify_storage/key_value_stores/default/INPUT.json');
+//var input = require('./apify_storage/key_value_stores/default/INPUT.json');
 
 async function loadStopper(crawlingContext) {
     await new Promise(resolve => setTimeout(resolve, 30000));
@@ -173,10 +173,10 @@ async function pageFunction(context) {
 }
 
 Apify.main(async () => {
-    //const input = await Apify.getInput();
+    const input = await Apify.getInput();
     //console.log(input);
     const startUrls = input['startUrls'];
-    dataset = await Apify.openDataset('etsyEn', { forceCloud: true});
+    dataset = await Apify.openDataset('etsyEnPlatform', { forceCloud: true});
 
     const requestList = await Apify.openRequestList('start-urls', startUrls);
     const requestQueue = await Apify.openRequestQueue();
