@@ -36,7 +36,7 @@ async function pageFunction(context) {
     //console.log("Running page function after stopping");
 
     const { selector_name, name } = await page.evaluate(() => {
-        let selector_name = 'h1[data-buy-box-listing-title="true"]';
+        let selector_name = '.product-title-container';
         let name = $(selector_name).text();
 
         if (name) {
@@ -54,9 +54,8 @@ async function pageFunction(context) {
     const shortDescription = '';
     const selector_shortDescription = '';
 
-
     const { selector_price, price } = await page.evaluate(() => {
-        let selector_price = 'div[data-buy-box-region="price"] p.wt-text-title-03';
+        let selector_price = '.lowest-sale-price';
         let price = $(selector_price).text();
 
         if (price) {
@@ -72,7 +71,7 @@ async function pageFunction(context) {
     //console.log("Running page function after price");
 
     const { selector_category, category } = await page.evaluate(() => {
-        let selector_category = 'div:has(> span.etsy-icon.wt-text-gray.wt-icon--smallest-xs)';
+        let selector_category = 'div[data-el="breadcrumbs"]';
         let category = $(selector_category + ' a').toArray().map((a) => $(a).text());
 
         if (category.length == 0) {
@@ -86,7 +85,7 @@ async function pageFunction(context) {
     //console.log("Running page after category");
 
     const { selector_longDescription, longDescription } = await page.evaluate(() => {
-        let selector_longDescription = '[data-content-toggle-uid="product-details-content-toggle"], #product-details-content-toggle, [data-content-toggle-uid="product-description-content-toggle"], #product-description-content-toggle';
+        let selector_longDescription = 'div.accordion:not([data-section="shipping-returns"])';
         let longDescription = $(selector_longDescription).text();
 
         if (longDescription) {
@@ -102,8 +101,14 @@ async function pageFunction(context) {
     //console.log("Running page after longDescription");
 
     const { selector_images, images } = await page.evaluate(() => {
-        let selector_images = 'div[data-component="listing-page-image-carousel"]';
-        let images = $(selector_images + ' img').toArray().map((img) => img.src);
+        let selector_images = 'div:has(> div[data-el="media"])';
+        let imageSrcs = $(selector_images + ' img').toArray().map((img) => img.src);
+        let images = [];
+        for(let src of imageSrcs) {
+            if(src != "") {
+                images.push(src);
+            }
+        }
 
         if (images.length == 0) {
             images = '';
@@ -176,7 +181,7 @@ Apify.main(async () => {
     const input = await Apify.getInput();
     //console.log(input);
     const startUrls = input['startUrls'];
-    dataset = await Apify.openDataset('etsyEnPlatform', { forceCloud: true});
+    dataset = await Apify.openDataset('bloomingdalesEnPlatform', { forceCloud: true});
 
     const requestList = await Apify.openRequestList('start-urls', startUrls);
     const requestQueue = await Apify.openRequestQueue();
