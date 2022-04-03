@@ -10,7 +10,9 @@ let dataset = {};
 const { handleStart, handleList, handleDetail } = require('./src/routes');
 
 const { utils: { log } } = Apify;
-//var input = require('./apify_storage/key_value_stores/default/INPUT.json');
+var input = "";
+if (!Apify.isAtHome())
+    input = require('./apify_storage/key_value_stores/default/INPUT.json');
 
 async function loadStopper(crawlingContext) {
     await new Promise(resolve => setTimeout(resolve, 30000));
@@ -178,10 +180,11 @@ async function pageFunction(context) {
 }
 
 Apify.main(async () => {
-    const input = await Apify.getInput();
+    if(Apify.isAtHome())
+        input = await Apify.getInput();
     //console.log(input);
     const startUrls = input['startUrls'];
-    dataset = await Apify.openDataset('bloomingdalesEnPlatform', { forceCloud: true});
+    dataset = await Apify.openDataset('bloomingdalesEn2222222', { forceCloud: true});
 
     const requestList = await Apify.openRequestList('start-urls', startUrls);
     const requestQueue = await Apify.openRequestQueue();
@@ -200,7 +203,7 @@ Apify.main(async () => {
             userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.84 Safari/537.36"
         },
         handlePageFunction: pageFunction,
-        maxConcurrency: 200,
+        maxConcurrency: Apify.isAtHome() ? 200 : 1,
         navigationTimeoutSecs: 120,
         preNavigationHooks: [
             async (crawlingContext) => {
