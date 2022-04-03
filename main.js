@@ -38,7 +38,7 @@ async function pageFunction(context) {
     //console.log("Running page function after stopping");
 
     const { selector_name, name } = await page.evaluate(() => {
-        let selector_name = '.product-title-container';
+        let selector_name = '.product-hero h1:first-child';
         let name = $(selector_name).text();
 
         if (name) {
@@ -57,7 +57,7 @@ async function pageFunction(context) {
     const selector_shortDescription = '';
 
     const { selector_price, price } = await page.evaluate(() => {
-        let selector_price = '.lowest-sale-price';
+        let selector_price = '.product-hero .current-price-container';
         let price = $(selector_price).text();
 
         if (price) {
@@ -73,8 +73,8 @@ async function pageFunction(context) {
     //console.log("Running page function after price");
 
     const { selector_category, category } = await page.evaluate(() => {
-        let selector_category = 'div[data-el="breadcrumbs"]';
-        let category = $(selector_category + ' a').toArray().map((a) => $(a).text());
+        let selector_category = '#chrome-breadcrumb';
+        let category = $(selector_category + ' li').toArray().map((a) => $(a).text());
 
         if (category.length == 0) {
             category = '';
@@ -87,7 +87,7 @@ async function pageFunction(context) {
     //console.log("Running page after category");
 
     const { selector_longDescription, longDescription } = await page.evaluate(() => {
-        let selector_longDescription = 'div.accordion:not([data-section="shipping-returns"])';
+        let selector_longDescription = '#product-details-container';
         let longDescription = $(selector_longDescription).text();
 
         if (longDescription) {
@@ -103,7 +103,7 @@ async function pageFunction(context) {
     //console.log("Running page after longDescription");
 
     const { selector_images, images } = await page.evaluate(() => {
-        let selector_images = 'div:has(> div[data-el="media"])';
+        let selector_images = '#gallery-content';
         let imageSrcs = $(selector_images + ' img').toArray().map((img) => img.src);
         let images = [];
         for(let src of imageSrcs) {
@@ -184,7 +184,7 @@ Apify.main(async () => {
         input = await Apify.getInput();
     //console.log(input);
     const startUrls = input['startUrls'];
-    dataset = await Apify.openDataset('bloomingdalesEn2222222', { forceCloud: true});
+    dataset = await Apify.openDataset('asosEn', { forceCloud: true});
 
     const requestList = await Apify.openRequestList('start-urls', startUrls);
     const requestQueue = await Apify.openRequestQueue();
